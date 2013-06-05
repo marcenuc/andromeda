@@ -10278,8 +10278,8 @@ class x_builder {
             $this->LogError("Directory does not exist: $dir");
             $SCRIPT.="\n";
             $SCRIPT.="mkdir $dir\n";
-            $SCRIPT.="chgrp ".$grp." $dir \n" ;
-            $SCRIPT.="chmod 2770 $dir\n";
+            $SCRIPT.="chgrp -Rf ".$grp." $dir \n" ;
+            $SCRIPT.="chmod -Rf 2770 $dir\n";
         }
         else {
             // Don't check subversion directories
@@ -10287,8 +10287,8 @@ class x_builder {
 
             if (! is_writable($dir) || !is_readable($dir)) {
                 $this->LogError("Wrong read/write perms on directory: $dir");
-                $SCRIPT.="chgrp $grp -R $dir \n";
-                $SCRIPT.="chmod 2770 -R $dir\n";
+                $SCRIPT.="chgrp $grp -Rf $dir \n";
+                $SCRIPT.="chmod 2770 -Rf $dir\n";
             }
             else {
                 // The "Checkallfiles" checks files and also recurses
@@ -10302,8 +10302,8 @@ class x_builder {
                         if (!is_writable($dir.$file) || !is_readable($dir.$file)) {
                             $this->LogError("Unwritable file in directory: $dir");
                       $this->LogEntry("-- file is: ".$file);
-                            $SCRIPT.="chgrp $grp $dir -R\n";
-                            $SCRIPT.="chmod 2770 $dir -R\n";
+                            $SCRIPT.="chgrp -Rf $grp $dir -R\n";
+                            $SCRIPT.="chmod -Rf 2770 $dir -R\n";
                       break;
                         }
                    if (is_dir($dir.$file)) {
