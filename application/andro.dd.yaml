@@ -65,19 +65,18 @@ column xdirs:
     description: Extra Dirs (Comma separated)
     type_id: vchar
     colprec: 200
-column svn_url:
-    description: Subversion URL
+column vcs_url:
+    description: Version Control URL
     type_id: vchar
     colprec: 200
-column svn_uid:
-    description: Subversion Username
+column vcs_uid:
+    description: Version Control Username
     type_id: vchar
     colprec: 25
-column svn_pwd:
-    description: Subversion Password
+column vcs_pwd:
+    description: Version Control Password
     type_id: vchar
     colprec: 25
-    
     
 table applications: 
     description: Applications
@@ -101,17 +100,14 @@ table applications:
         auto_formula: andro_universal
     column appspec:
         description: Spec File
-    column flag_svn:
-        suffix: _svn
-        description: Overwrite from SVN
-        tooltip: This flag must be set to Y to use subversion
-        automation_id: DEFAULT
-        auto_formula: "N"
-    column svn_url:   
-    column svn_uid:
-        tooltip: Type this in if your Subversion repository requires login.
-    column svn_pwd:
-        tooltip: Type this in if your Subversion repository requires login. 
+    foreign_key version_control_systems:
+        column vcs_type:
+            description: Version Control
+    column vcs_url:
+    column vcs_uid:
+        tooltip: Type this in if your version control system requires login.
+    column vcs_pwd:
+        tooltip: Type this in if your version control system repository requires login.
     foreign_key webpaths:
         column webpath:
             description: Web Path
@@ -138,8 +134,33 @@ table applications:
     
     projection dropdown:
         column description:
-    
-        
+
+column vcs_type:
+    description: Version Control Type
+    type_id: vchar
+    colprec: 25
+column vcs_description:
+    description: Description
+    type_id: vchar
+    colprec: 50
+
+table version_control_systems:
+    description: Version Control Systems
+    module: apps
+
+    column vcs_type:
+        primary_key: "Y"
+        uisearch: "Y"
+    column  vcs_description:
+        uisearch: "Y"
+
+content version_control_systems:
+    columns: [ vcs_type, vcs_description ]
+    values:
+        - [ svn, Subversion ]
+        - [ git, Git ]
+
+
 column instance:
     description: Instance Code
     type_id:char
@@ -249,10 +270,10 @@ table instbuilds:
 #    uisort: 205
 #    description: Update Andromeda from Subversion 
 
-menu a_pullsvn:
-    module: apps
-    uisort: 206
-    description: Pull Code From Subversion
+#menu a_pullsvn:
+#    module: apps
+#    uisort: 206
+#    description: Pull Code From Subversion
 
 
 
@@ -369,10 +390,7 @@ table usersroot:
     column member_md5:
         prefix: member_
         description: MD5 Password
-    
-# ========================================================================
-# MODULE: Deprecated source control
-# ========================================================================
+
 module source:
     description: Source Control
     uisort: 250
@@ -384,58 +402,4 @@ module source:
 menu a_pullcode:
     module: source
     uisort: 100
-    description: Pull Software Updates (Deprecated)
-
-table appversions:
-    description: Application Versions
-    uisort: 200
-    module: source
-    
-    foreign_key  applications: 
-        uisearch: "Y"
-        primary_key: "Y"
-    column version:
-        uisearch: "Y" 
-        primary_key: "Y"
-    column date_ts:
-        suffix: _ts
-        description: Version Date
-        uisearch: "Y"
-    column notes:
-        description: Version Notes
-
-        
-table appfiles:
-    description: Application Version Files;
-    module: source
-    uisort: 300
-    nomenu: "Y"
-    
-    foreign_key appversions:
-        primary_key: "Y"
-        uisearch: "Y"
-    
-    foreign_key appdirs:
-        uisearch: "Y"
-    
-    column      filename:
-        primary_key: "Y"
-        uisearch: "Y"
-    
-    column filepath:
-        uisearch: "Y"
-    column filecnts:
-    
-    column flag_del:
-        suffix: _del
-        description: File Deleted
-    
-    column filets:
-        prefix: file
-        description: File timestamp
-        uisearch: "Y"
-    
-    column filemd5:  
-        prefix: file
-        description: File md5
-
+    description: Pull Software Updates

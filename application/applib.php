@@ -109,15 +109,15 @@ function sourceDeprecated() {
  * the local station for latest versions
  *
  */
-function svnVersions() {
+function applicationVersions() {
     // Get a list of applications
     $sq="SELECT skey,application,description
-               ,svn_url
+               ,vcs_url
                ,'  ' as local
                ,'  ' as latest
-               ,svn_uid,svn_pwd,flag_svn
+               ,vcs_uid,vcs_pwd
            FROM applications
-          WHERE flag_svn = 'Y'
+          WHERE vcs_type != '' AND vcs_type IS NOT NULL
           ORDER by application";
     $rows = SQL_Allrows($sq,'application');
     
