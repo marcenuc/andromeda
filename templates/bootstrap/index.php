@@ -172,6 +172,18 @@ include('androHTMLHead.php');
 			?>
 		</div>
 	</div>
+    <div id="modal-create" class="modal hide fade" tabindex="-1">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+            <h3 id="modalHeader">Modal header</h3>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+        </div>
+
+    </div>
 	<div class="templatefooter">
 	<?php echo mosLoadModules('footer');?>
 	</div>

@@ -4428,3 +4428,39 @@ function u3SS(stringparms) {
    formSubmit();
 }
 
+$(function() {
+    $(".ajax-modal").on('click', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        var modal_id = $(this).data('controls-modal');
+        $('#' + modal_id + ' .modal-body').html('');
+        var title = $(this).data('title');
+        $("#" + modal_id + " #modalHeader").html(title);
+        $("#" + modal_id).modal({
+            backdrop: true,
+            keyboard: true,
+            show: true,
+            remote:url
+        });
+    });
+
+    $(".iframe-modal").on('click', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        var modal_id = $(this).data('controls-modal');
+        $('#' + modal_id + ' .modal-body').html('');
+        var title = $(this).data('title');
+        $("#" + modal_id + " #modalHeader").html(title);
+        $("#" + modal_id).modal({
+            backdrop: true,
+            keyboard: true,
+            show: true
+        });
+        $('#' + modal_id + ' .modal-body').html('<iframe width="99%" heigh="99%" src="' + url + '" frameborder="0"></iframe>');
+    });
+
+    $('body').on('hidden', '.modal', function () {
+        $(this).removeData('modal');
+    });
+});
+

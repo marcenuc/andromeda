@@ -236,40 +236,38 @@ class a_pullsvn extends x_table2 {
     function mainPull() { 
         # Don't hold up the system
         Session_write_close();
-        
-        $rows=svnVersions();
+        $app = gp('app', '');
+        $app = urldecode($app);
+        $rows=applicationVersions($app);
         $dir=fsDirTop().'pkg-apps/';
 
-        x_echoFlush('<pre>');
-        x_EchoFlush('<h2>Pulling Software Updates From SVN</h2>');
+        echo('<pre>');
+        echo('<h4>Pulling Software Updates From SVN</h4>');
         
         // Loop through the apps.
         foreach($rows as $row) {
-            x_EchoFlush("");
-            x_echoFlush("<b>Application: ".$row['application']."</b>");
-            if($row['svn_url']=='') {
+            echo("<b>Application: ".$row['application']."</b>\n");
+            if($row['vcs_url']=='') {
                 x_echoFlush("  No SVN repository, skipping.");
                 continue;
             }
 
             # Add a trailing slash to svn_url
-            $row['svn_url'] = AddSlash(trim($row['svn_url']));
+            $row['vcs_url'] = AddSlash(trim($row['vcs_url']));
             
             # If there is a username and password both, use those
-            $urlDisplay = $row['svn_url'];
-            $url = $row['svn_url'];
-            if($row['svn_uid']<>'' && $row['svn_pwd'] <> '') {
+            $urlDisplay = $row['vcs_url'];
+            $url = $row['vcs_url'];
+            if($row['vcs_uid']<>'' && $row['vcs_pwd'] <> '') {
                 list($proto,$urlstub) = explode("//",$url);
-                $uid=$row['svn_uid'];
-                $pwd=$row['svn_pwd'];
+                $uid=$row['vcs_uid'];
+                $pwd=$row['vcs_pwd'];
                 $url="$proto//$uid:$pwd@$urlstub";
                 $urlDisplay = "$proto//$uid:*****@$urlstub";
                     
             }
-            x_echoFlush("  Complete URL: ".$urlDisplay);
             
             # Now pull the list of versions
-            x_echoFlush("  Querying for latest version");
             $rawtext = @file_get_contents($url);
             if ( $rawtext ) {
                 $matches=array();
@@ -281,11 +279,11 @@ class a_pullsvn extends x_table2 {
                     }
                 }
                 if(count($versions)==0) {
-                    x_EchoFlush("  No versions listed, nothing to pull.");
+                    echo("  No versions listed, nothing to pull.\n");
                     continue;
                 }
             } else {
-                x_EchoFlush( "Unable to get a release list from the svn server.");
+                echo( "Unable to get a release list from the svn server.\n");
                 continue;
             }
             
@@ -294,18 +292,18 @@ class a_pullsvn extends x_table2 {
             if(substr($latest,-1)=='/') {
                 $latest = substr($latest,0,strlen($latest)-1);
             }
-            x_echoFlush("  Latest version is: ".$latest);
-            x_EchoFlush("  Local version is: ".$row['local']);
+            echo("  Latest version is: ".$latest ."\n");
+            echo("  Local version is: ".$row['local'] ."\n");
 
             # Decide if we need to continue
             if($latest == $row['local']) {
-                x_EchoFlush("  Local version is latest, nothing do to.");
+                echo("  Local version is latest, nothing do to.\n");
                 continue;
             }
 
             # Determine some stub values and pass processing to
             # the recursive file puller.  If no uid & pwd, use subversion
-            x_EchoFlush("  Local version is out of date, pulling latest");
+            echo("  Local version is out of date, pulling latest\n");
             $dirv = $dir.trim($row['application']).'-VER-'.$latest.'/';
             if($row['svn_uid']<>'' && $row['svn_pwd'] <> '') {
                 mkdir($dirv);
@@ -313,30 +311,27 @@ class a_pullsvn extends x_table2 {
             }
             else {
                 $command = "svn export $url$latest $dirv";
-                x_echoFlush(
-                    "  Pulling code now, this make take a minute or three..."
-                );
-                x_EchoFlush($command);
                 `$command`;
-                x_echoFlush("  Code pulled, finished with this application.");
+
             }
-            
-            x_echoFlush("  Copying files into application directory");
-            $basedir = str_replace( 'andro/', '', fsDirTop()); 
+            echo("  Code pulled, finished with this application.\n");
+            echo("  Copying files into application directory\n");
+            $basedir = str_replace( 'andro/', '', fsDirTop());
             if ( isWindows() ) {
-               $command = 'xcopy /y /e /c /k /o ' .$dirv .'* ' 
+               $command2 = 'xcopy /y /e /c /k /o ' .$dirv .'* '
                     .$basedir .trim( $row['application'] ) .'/';
             }
             else {
                $command2 = 'cp -Rf ' .$dirv .'* ' 
                     .$basedir .trim( $row['application']) .'/';
             }
-            echo( $command2 );
             `$command2`;
         }
-        
-        x_echoFlush("<hr/>");
-        x_EchoFlush("<h3>Processing Complete</h3>");
+
+        echo("<hr/>");
+        echo("<h5>Processing Complete</h5>");
+        echo( 'You must now run a build of your application');
+        echo( '</pre>');
         
         $this->flag_buffer=false;
     }        

@@ -78,7 +78,7 @@ function hLinkBuild($app,$caption, $code_only=false) {
         $link_options['code_only'] = 1;
     }
     return hLinkPopup(
-        'small pull-right'
+        'small pull-right iframe-modal'
         ,$caption
         ,$link_options
     );
@@ -109,7 +109,7 @@ function sourceDeprecated() {
  * the local station for latest versions
  *
  */
-function applicationVersions() {
+function applicationVersions($app='') {
     // Get a list of applications
     $sq="SELECT skey,application,description
                ,vcs_url
@@ -117,7 +117,7 @@ function applicationVersions() {
                ,'  ' as latest
                ,vcs_uid,vcs_pwd
            FROM applications
-          WHERE vcs_type != '' AND vcs_type IS NOT NULL
+          WHERE " .(!empty($app) ? " application='" .$app ."' AND " : "" ) ."vcs_type != '' AND vcs_type IS NOT NULL
           ORDER by application";
     $rows = SQL_Allrows($sq,'application');
     
@@ -155,7 +155,7 @@ function appModuleLeft() {
     $retVal .= "<li class=\"nav-header\">Updates</li>";
     
     $retVal .= '<li>';
-	$retVal .= '<a class="small" href="?gp_page=a_pullsvn">Pull Code From Subversion</a>';
+	$retVal .= '<a class="small" href="?gp_page=a_pullcode">Check for Application Updates</a>';
     $retVal .= '</li>';
     
     

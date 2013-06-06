@@ -23,19 +23,21 @@ class a_pullcode extends x_table2 {
     function main() {
         $sql = "SELECT application, vcs_url, vcs_uid, vcs_pwd, a.vcs_type, coalesce(b.vcs_description, '') as vcs_description FROM applications a LEFT JOIN version_control_systems b on a.vcs_type=b.vcs_type ORDER BY application";
         $applications = SQL_AllRows($sql);
-        $html = '<div class="hero-unit"><h2>Software Updates</h2></div>';
+        $html = '<div class="hero-unit"><h2>Application Updates</h2></div>';
         $html .= '<table class="table table-bordered table-striped table-condensed table-hover">';
         $html .= '<thead>';
-        $html .= '<tr><th>Application</th><th>Version Control</th><th style="text-align:center;">Current Version</th><th style="text-align:center;">Latest Version</th></tr>';
+        $html .= '<tr><th>Application</th><th>Version Control</th><th style="text-align:center;">Current Version</th><th style="text-align:center;">Latest Version</th><th style="text-align:right;">Options</th></tr>';
         $html .= '</thead>';
         if (!empty($applications)) {
             foreach( $applications as $application ) {
                 $version = $this->getLatestVersion($application);
-                $html .= '<tr>
+                $class = ($version['latest'] > $version['current'] ? 'info' : '' );
+                $html .= '<tr class="' .$class .'">
                     <td>' .$application['application'] .'</td>
                     <td>' .( !empty($application['vcs_description']) ? $application['vcs_description'] : '<i>Not Set</i>' ) .'</td>
                     <td style="text-align:center;">' .$version['current'] .'</td>
-                    <td style="text-align:center;' .($version['latest'] > $version['current'] ? 'background-color:green;color:#FFFFFF;font-weight:bold;' : '' )  .'">' .$version['latest'].'</td>
+                    <td style="text-align:center;">' .$version['latest'].'</td>
+                    <td style="text-align:right;">' .($class === 'info' ? $this->getUpdateLink($application) : '') .'</td>
                 </tr>';
             }
         } else {
@@ -45,6 +47,15 @@ class a_pullcode extends x_table2 {
         $html .= '</table>';
 
         echo $html;
+    }
+
+    function getUpdateLink($application) {
+        $link = '';
+        if ($application['vcs_type'] === 'svn') {
+            $link = '<a data-title="Upgrade Application: ' .trim($application['application']) .'" data-controls-modal="modal-create" class="ajax-modal" data-toggle="modal" href="/index.php?gp_page=a_pullsvn&svnpull=1&gp_out=success&app=' .urlencode($application['application']) .'">Upgrade Now</a>';
+        }
+
+        return $link;
     }
 
     function getLatestVersion($application) {

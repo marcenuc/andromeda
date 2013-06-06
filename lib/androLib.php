@@ -8980,9 +8980,8 @@ function hLinkFromStub($class,$caption,$href) {
 function hLinkPopup($class,$caption,$parms) {
    $class=hTagParm('class',$class);
    $hparms = is_array($parms) ? http_build_query($parms) : $parms;
-   return "<a href=\"javascript:Popup('index.php?$hparms','$caption')\""
-      ." $class>"
-      .$caption."</a>";
+   return '<a data-controls-modal="modal-create" data-title="' .$caption .'" href="\index.php?' .$hparms  .'" ' .$class .'>'
+      .$caption.'</a>';
 }
 
 /**

@@ -105,13 +105,13 @@ class x_welcome extends x_table2 {
         
         // Work out if there is a new release available
         //
-        $apps = svnVersions();
-        $andro = a($apps,'andro',array('svn_url'=>''));
+        $apps = applicationVersions();
+        $andro = a($apps,'andro',array('vcs_url'=>''));
         
-        if(trim($andro['svn_url'])=='') {
+        if(trim($andro['vcs_url'])=='') {
             $htmlVersions = '';
         } else {
-            $htmlVersions = @file_get_contents($andro['svn_url']);
+            $htmlVersions = @file_get_contents($andro['vcs_url']);
         }
         $matches =array();
         preg_match_all(
@@ -133,8 +133,8 @@ class x_welcome extends x_table2 {
             font-weight: bolder; margin: 8px; padding: 0 8px 8px 8px">
             <h2>New Version of Andromeda Available</h2>
             
-            <p>Version <?php echo $latest?> is available.   <a href="?gp_page=a_pullsvn"
-            >Click Here </a> to go to the Pull Code From Subversion.
+            <p>Version <?php echo $latest?> is available.   <a href="?gp_page=a_pullcode"
+            >Click Here </a> to get the latest available <version></version>.
             </div>
             <?php        
             }
