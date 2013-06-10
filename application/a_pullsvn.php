@@ -225,6 +225,25 @@ class a_pullsvn extends x_table2 {
         <?php
         
     }
+
+    function recursiveCopy($src, $dest) {
+        if(is_dir($src)) {
+            $dir_handle=opendir($src);
+            while($file=readdir($dir_handle)){
+                if($file!="." && $file!=".."){
+                    if(is_dir($src."/".$file)){
+                        mkdir($dest."/".$file);
+                        copy($src .DIRECTORY_SEPARATOR .$file, $dest .DIRECTORY_SEPARATOR .$file);
+                    } else {
+                        copy($src .DIRECTORY_SEPARATOR .$file, $dest .DIRECTORY_SEPARATOR .$file);
+                    }
+                }
+            }
+            closedir($dir_handle);
+        } else {
+            copy($src, $dest);
+        }
+    }
     
 
     /**
@@ -303,6 +322,7 @@ class a_pullsvn extends x_table2 {
             x_echoFlush("  Code pulled, finished with this application.\n");
             x_echoFlush("  Copying files into application directory\n");
             $basedir = str_replace( 'andro/', '', fsDirTop());
+            /*
             if ( isWindows() ) {
                $command2 = 'xcopy /y /e /c /k /o ' .$dirv .'* '
                     .$basedir .trim( $row['application'] ) .'/';
@@ -310,8 +330,9 @@ class a_pullsvn extends x_table2 {
             else {
                $command2 = 'cp -Rf ' .$dirv .'* ' 
                     .$basedir .trim( $row['application']) .'/';
-            }
-            `$command2`;
+            }*/
+
+            $this->recursiveCopy($dirv, $basedir .trim( $row['application'] ) );
         }
 
         x_echoFlush("<hr/>");
