@@ -1,4 +1,6 @@
-<?php defined( '_VALID_MOS' ) 
+<?php
+   // ini_set("zlib.output_compression", 4096);
+    defined( '_VALID_MOS' )
     or die( 'Direct Access to this location is not allowed.' );
 ?>
 <?php 
@@ -201,3 +203,7 @@ include('androHTMLHead.php');
 ?>
 </body>
 </html>
+<?php
+for ($i = 0; $i < ob_get_level(); $i++) { ob_end_flush(); }
+ob_implicit_flush(1);
+?>

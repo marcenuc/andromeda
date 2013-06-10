@@ -233,7 +233,12 @@ class a_pullsvn extends x_table2 {
      * 
      *
      */
-    function mainPull() { 
+    function mainPull() {
+        if (function_exists('apache_setenv')) {
+            @apache_setenv('no-gzip', 1);
+        }
+        @ini_set('zlib.output_compression', 0);
+        @ini_set('implicit_flush', 1);
         # Don't hold up the system
         Session_write_close();
         $app = gp('app', '');
@@ -241,12 +246,12 @@ class a_pullsvn extends x_table2 {
         $rows=applicationVersions($app);
         $dir=fsDirTop().'pkg-apps/';
 
-        echo('<pre>');
-        echo('<h4>Pulling Software Updates From SVN</h4>');
+        x_echoFlush('<pre>');
+        x_echoFlush('<h4>Pulling Software Updates From SVN</h4>');
         
         // Loop through the apps.
         foreach($rows as $row) {
-            echo("<b>Application: ".$row['application']."</b>\n");
+            x_echoFlush("<b>Application: ".$row['application']."</b>\n");
             if($row['vcs_url']=='') {
                 x_echoFlush("  No SVN repository, skipping.");
                 continue;
@@ -262,38 +267,25 @@ class a_pullsvn extends x_table2 {
                 list($proto,$urlstub) = explode("//",$url);
                 $uid=$row['vcs_uid'];
                 $pwd=$row['vcs_pwd'];
-                $url="$proto//$uid:$pwd@$urlstub";
+                $browseUrl = "$proto//$uid:$pwd@$urlstub";
                 $urlDisplay = "$proto//$uid:*****@$urlstub";
                     
             }
             
             # Now pull the list of versions
-            $rawtext = @file_get_contents($url);
-            if ( $rawtext ) {
-                $matches=array();
-                preg_match_all('!\<li\>\<a.*\>(.*)\</a\>\</li\>!U',$rawtext,$matches);
-                $versions = $matches[1];
-                foreach( $versions as $key=>$version ) {
-                    if ( $version == '..' ) {
-                        unset( $versions[$key] );
-                    }
-                }
-                if(count($versions)==0) {
-                    echo("  No versions listed, nothing to pull.\n");
-                    continue;
-                }
-            } else {
-                echo( "Unable to get a release list from the svn server.\n");
-                continue;
-            }
-            
+            $command = "svn list $url --xml" .(!empty($row['vcs_uid']) ? " --non-interactive --no-auth-cache --username " .$row['vcs_uid'] : "") .(!empty($row['vcs_uid']) ? " --password " .$row['vcs_pwd'] : "");
+            exec($command, $lines);
+            $xml = implode("\n", $lines);
+            $parsed = simplexml_load_string($xml);
+            $latestRelease = end(end($parsed->list));
+            $latest = (string)$latestRelease->name;
+
             # Work out what the latest was and report it
-            $latest=array_pop($versions);
             if(substr($latest,-1)=='/') {
                 $latest = substr($latest,0,strlen($latest)-1);
             }
-            echo("  Latest version is: ".$latest ."\n");
-            echo("  Local version is: ".$row['local'] ."\n");
+            x_echoFlush("  Latest version is: ".$latest ."\n");
+            x_echoFlush("  Local version is: ".$row['local'] ."\n");
 
             # Decide if we need to continue
             if($latest == $row['local']) {
@@ -303,19 +295,13 @@ class a_pullsvn extends x_table2 {
 
             # Determine some stub values and pass processing to
             # the recursive file puller.  If no uid & pwd, use subversion
-            echo("  Local version is out of date, pulling latest\n");
+            x_echoFlush("  Local version is out of date, pulling latest\n");
             $dirv = $dir.trim($row['application']).'-VER-'.$latest.'/';
-            if($row['svn_uid']<>'' && $row['svn_pwd'] <> '') {
-                mkdir($dirv);
-                $this->svnWalk("$url/$latest/",$dirv);
-            }
-            else {
-                $command = "svn export $url$latest $dirv";
-                `$command`;
 
-            }
-            echo("  Code pulled, finished with this application.\n");
-            echo("  Copying files into application directory\n");
+            $command = "svn export $url$latest $dirv" .(!empty($row['vcs_uid']) ? " --non-interactive --no-auth-cache --username " .$row['vcs_uid'] : "") .(!empty($row['vcs_uid']) ? " --password " .$row['vcs_pwd'] : "");
+            `$command`;
+            x_echoFlush("  Code pulled, finished with this application.\n");
+            x_echoFlush("  Copying files into application directory\n");
             $basedir = str_replace( 'andro/', '', fsDirTop());
             if ( isWindows() ) {
                $command2 = 'xcopy /y /e /c /k /o ' .$dirv .'* '
@@ -328,12 +314,14 @@ class a_pullsvn extends x_table2 {
             `$command2`;
         }
 
-        echo("<hr/>");
-        echo("<h5>Processing Complete</h5>");
-        echo( 'You must now run a build of your application');
-        echo( '</pre>');
+        x_echoFlush("<hr/>");
+        x_echoFlush("<h5>Processing Complete</h5>");
+        x_echoFlush( 'You must now run a build of your application');
+        x_echoFlush( '</pre>');
         
         $this->flag_buffer=false;
+        for ($i = 0; $i < ob_get_level(); $i++) { ob_end_flush(); }
+        ob_implicit_flush(1);
     }        
     
     function svnWalk($url,$dirv) {

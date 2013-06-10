@@ -52,7 +52,7 @@ class a_pullcode extends x_table2 {
     function getUpdateLink($application) {
         $link = '';
         if ($application['vcs_type'] === 'svn') {
-            $link = '<a data-title="Upgrade Application: ' .trim($application['application']) .'" data-controls-modal="modal-create" class="ajax-modal" data-toggle="modal" href="/index.php?gp_page=a_pullsvn&svnpull=1&gp_out=success&app=' .urlencode($application['application']) .'">Upgrade Now</a>';
+            $link = '<a data-title="Upgrade Application: ' .trim($application['application']) .'" data-controls-modal="modal-create" class="iframe-modal" data-toggle="modal" href="" data-url="' .(!empty($_SERVER['HTTPS']) ? 'https://' : 'http://') .$_SERVER['SERVER_NAME'] .'/index.php?gp_page=a_pullsvn&amp;svnpull=1&amp;gp_out=success&amp;app=' .str_replace(' ', '', $application['application']) .'">Upgrade Now</a>';
         }
 
         return $link;
@@ -75,8 +75,10 @@ class a_pullcode extends x_table2 {
 
     function getCurrentVersion($application) {
         $apps = applicationVersions();
-        $current = a($apps,$application['application'],array('vcs_url'=>''));
-        $current = $current['local'];
+        $appName = trim($application['application']);
+        $current = a($apps, $appName,array('vcs_url'=>''));
+        $current['local'];
+        return $current['local'];
     }
 
     function getSVNVersion($application) {

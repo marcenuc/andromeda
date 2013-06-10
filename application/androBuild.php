@@ -10143,7 +10143,7 @@ class x_builder {
             $this->LogEntry("    " ."Found");
             $handle = fopen($dir_pubx .DIRECTORY_SEPARATOR .'.htaccess','a');
             if ($handle) {
-                fwrite($handle, "## DO NOT EDIT ##\n# Application Specific .htaccess config from application/htaccess_addt");
+                fwrite($handle, "## DO NOT EDIT ##\n# Application Specific .htaccess config from application/htaccess_addt\n");
                 fwrite($handle, file_get_contents($addt_file) ."\n");
                 fclose($handle);
             }
@@ -10199,7 +10199,7 @@ class x_builder {
 
           }
           else {
-             $cmd="cp -rf $src/$name/* $tgt/$name/";
+             $cmd="cp -rf $src/$name/. $tgt/$name/";
           }
           $this->LogEntry($cmd);
           `$cmd`;

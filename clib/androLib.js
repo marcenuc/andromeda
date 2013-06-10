@@ -4433,22 +4433,7 @@ $(function() {
         e.preventDefault();
         var url = $(this).attr('href');
         var modal_id = $(this).data('controls-modal');
-        $('#' + modal_id + ' .modal-body').html('');
-        var title = $(this).data('title');
-        $("#" + modal_id + " #modalHeader").html(title);
-        $("#" + modal_id).modal({
-            backdrop: true,
-            keyboard: true,
-            show: true,
-            remote:url
-        });
-    });
-
-    $(".iframe-modal").on('click', function(e) {
-        e.preventDefault();
-        var url = $(this).attr('href');
-        var modal_id = $(this).data('controls-modal');
-        $('#' + modal_id + ' .modal-body').html('');
+        $('#' + modal_id + ' .modal-body').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>');
         var title = $(this).data('title');
         $("#" + modal_id + " #modalHeader").html(title);
         $("#" + modal_id).modal({
@@ -4456,7 +4441,31 @@ $(function() {
             keyboard: true,
             show: true
         });
-        $('#' + modal_id + ' .modal-body').html('<iframe width="99%" heigh="99%" src="' + url + '" frameborder="0"></iframe>');
+        $('#' + modal_id + ' .modal-body').load(url);
+    });
+
+    $(".iframe-modal").on('click', function(e) {
+        e.preventDefault();
+        var url = $(this).data('url');
+        var modal_id = $(this).data('controls-modal');
+        $('#' + modal_id + ' .modal-body').html('<div id="create-progress" class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>');
+        var title = $(this).data('title');
+        $("#" + modal_id + " #modalHeader").html(title);
+        frame = document.createElement('iframe');
+        frame.width = "100%";
+        frame.height = "300";
+        frame.src = url;
+        frame.frameBorder=0;
+        frame.onLoad= function() {
+            $('#create-progress').remove();
+        };
+        $('#' + modal_id + ' .modal-body').append(frame);
+        $("#" + modal_id).modal({
+            backdrop: true,
+            keyboard: true,
+            show: true
+        });
+
     });
 
     $('body').on('hidden', '.modal', function () {
