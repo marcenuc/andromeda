@@ -1,0 +1,3 @@
+[submodule "appclib/ace"]
+	path = appclib/ace
+	url = https://github.com/ajaxorg/ace-builds.git
