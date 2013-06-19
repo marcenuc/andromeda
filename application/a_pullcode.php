@@ -67,6 +67,8 @@ class a_pullcode extends x_table2 {
             $version['current'] = $this->getCurrentVersion($application);
             if ($application['vcs_type'] == 'svn') {
                 $version['latest'] = $this->getSVNVersion($application);
+            } else if ($application['vcs_type'] == 'git') {
+                $version['latest'] = $this->getGitVersion($application);
             }
         }
 
@@ -101,6 +103,11 @@ class a_pullcode extends x_table2 {
         }
 
         return $version;
+    }
+
+    function getGitVersion($application) {
+
+
     }
 }
 ?>
