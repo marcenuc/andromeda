@@ -21,7 +21,7 @@
 \* ================================================================== */
 class a_pullcode extends x_table2 {
     function main() {
-        $sql = "SELECT application, vcs_url, vcs_uid, vcs_pwd, a.vcs_type, coalesce(b.vcs_description, '') as vcs_description FROM applications a LEFT JOIN version_control_systems b on a.vcs_type=b.vcs_type ORDER BY application";
+        $sql = "SELECT application, vcs_url, vcs_uid, vcs_pwd, a.vcs_type, coalesce(b.vcs_description, '') as vcs_description FROM " .ddView('applications' ) ." a LEFT JOIN " .ddView('version_control_systems') ." b on a.vcs_type=b.vcs_type ORDER BY application";
         $applications = SQL_AllRows($sql);
         $html = '<div class="hero-unit"><h2>Application Updates</h2></div>';
         $html .= '<table class="table table-bordered table-striped table-condensed table-hover">';
@@ -64,11 +64,11 @@ class a_pullcode extends x_table2 {
             'latest'=>'N/A'
         );
         if (!empty($application['vcs_type'])) {
-            $version['current'] = $this->getCurrentVersion($application);
+            $version['current'] = self::getCurrentVersion($application);
             if ($application['vcs_type'] == 'svn') {
-                $version['latest'] = $this->getSVNVersion($application);
+                $version['latest'] = self::getSVNVersion($application);
             } else if ($application['vcs_type'] == 'git') {
-                $version['latest'] = $this->getGitVersion($application);
+                $version['latest'] = self::getGitVersion($application);
             }
         }
 
@@ -106,8 +106,20 @@ class a_pullcode extends x_table2 {
     }
 
     function getGitVersion($application) {
+        $version = '';
+        $gitcmd = 'git ls-remote --tags ' .$application['vcs_url'] .' release-*';
+        exec($gitcmd, $tags);
+        if (!empty($tags)) {
+            for($i=(count($tags) - 1);$i>=0;$i--) {
+                if (substr($tags[$i], -3) !== '^{}') {
+                    if (preg_match('/\/(?P<version>release-.+)/i', $tags[$i], $matches) > 0) {
+                        $version = $matches['version'];
+                    }
+                }
+            }
+        }
 
-
+        return $version;
     }
 }
 ?>

@@ -2102,7 +2102,7 @@ class x_builder {
 
 
         #  Define the sql
-        $sq="INSERT INTO zdd.tabflat (table_id,$colslist)
+        $sq="INSERT INTO zdd.tabflat (table_id, $colslist)
              SELECT '*TABLEDEST*',$colslist
                FROM zdd.tabflat
               WHERE table_id = '*TABLESOURCE*'

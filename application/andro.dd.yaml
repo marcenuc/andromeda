@@ -101,6 +101,7 @@ table applications:
     column appspec:
         description: Spec File
     foreign_key version_control_systems:
+        allow_empty: "Y"
         column vcs_type:
             description: Version Control
     column vcs_url:

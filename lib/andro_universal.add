@@ -285,7 +285,6 @@ table users {
 	description: Application Users;
 	module: system;
     uisort: 100;
-    x6profile: twosides;
     group usermaint { nomenu: N; permsel: Y; permins: Y; permupd: Y; permdel: Y;}
 
 	column user_id { primary_key: Y; uisearch: Y; }
@@ -358,8 +357,6 @@ menu skinShow {
 table usersxgroups {
 	description: Group Membership;
 	module: system;
-	nomenu: Y;
-    x6xref: checkbox;
     group usermaint { permsel: Y;permins: Y;permupd: Y;permdel: Y;}
 
 	foreign_key { table_id_par: users; primary_key: Y; uisearch: Y;
@@ -642,7 +639,6 @@ table configapp {
     module: system;
     uisort: 551;
     description: Application Configuration;
-    x6profile: onerow;
     nomenu: N;
 
     group $LOGIN { permsel: "Y"; nomenu: "Y";  }
@@ -658,7 +654,6 @@ table configinst {
     uisort: 552;
     description: System Configuration;
     spaceafter: Y;
-    x6profile: onerow;
 
     group $LOGIN { permsel: "Y"; }
     group configadmin { permupd: "Y"; permsel: "Y"; nomenu: "N"; }

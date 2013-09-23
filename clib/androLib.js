@@ -4446,7 +4446,7 @@ $(function() {
 
     $(".iframe-modal").on('click', function(e) {
         e.preventDefault();
-        var url = $(this).data('url');
+        var url = $(this).attr('href');
         var modal_id = $(this).data('controls-modal');
         $('#' + modal_id + ' .modal-body').html('<div id="create-progress" class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>');
         var title = $(this).data('title');
